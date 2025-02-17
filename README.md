@@ -33,6 +33,99 @@ Contains test code executed before code is deployed to the robot. This ensures t
 
 Handles all robot position data and mechanism logging for dashboard use and analysis.
 
+## Button Bindings
+
+### Driver Controller
+
+#### Driving
+
+Left Joystick X: Strafe<br>
+Left Joystick Y: Forward<br>
+Right Joystick X: Rotate
+
+#### Auto Pathfinding
+
+Left Trigger/Y: Reef A<br>
+Right Trigger/Y: Reef B
+
+Left Trigger/X: Reef C<br>
+Right Trigger/X: Reef D
+
+Left Trigger/A: Reef E<br>
+Right Trigger/A: Reef F
+
+Left Trigger/B: Reef G<br>
+Right Trigger/B: Reef H
+
+Left Trigger/Right Bumper: Reef I<br>
+Right Trigger/Right Bumper: Reef J
+
+Left Trigger/Left Bumper: Reef K<br>
+Right Trigger/Left Bumper: Reef L
+
+Left Trigger/Right Trigger/Left Bumper: Coral Station 1<br>
+Left Trigger/Right Trigger/Right Bumper: Coral Station 2
+
+#### Swerve SysID Routines
+
+Back/Y: Dynamic Forward<br>
+Back/X: Dynamic Reverse<br>
+Start/Y: Quasistatic Forward<br>
+Start/X: Quasistatic Reverse
+
+#### Miscellaneous
+
+A: Brake<br>
+B: Point modules towards direction of left joystick<br>
+Left Bumper: Reset pose to 0
+
+### Function Controller
+
+#### Intaking Positions
+
+Left Bumper: Funnel Intake<br>
+Left Bumper/Back: Ground Intake
+
+B/Start: L2 Algae Intake<br>
+X/Start: L3 Algae Intake
+
+#### Scoring Positions
+
+A: L1<br>
+B: L2<br>
+X: L3<br>
+Y: L4
+
+Y/Start: Net Scoring<br>
+A/Start: Processor Scoring
+
+#### Scoring
+
+Right Bumper: Outtaking<br>
+
+#### Climbing
+
+Left POV: Climb Positive<br>
+Right POV: Climb Negative
+
+#### Pivot SysID Routines
+
+Left POV/Y: Dynamic Forward<br>
+Left POV/A: Dynamic Reverse<br>
+Right POV/Y: Quasistatic Forward<br>
+Right POV/A: Quasistatic Reverse
+
+#### Elevator SysID Routines
+
+Up POV/Y: Dynamic Forward<br>
+Up POV/A: Dynamic Reverse<br>
+Down POV/Y: Quasistatic Forward<br>
+Down POV/A: Quasistatic Reverse
+
+#### Miscellaneous
+
+Left Stick/Right Stick: Default State<br>
+
 ## Credits
 
 This robot could not have been programmed without the incredible talent, skills, and determination from the following:
