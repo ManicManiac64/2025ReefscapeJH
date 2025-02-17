@@ -34,10 +34,11 @@ class StateSubsystem(Subsystem, ABC, metaclass=StateSubsystemMeta):
         # Create NT folder for organization
         self._network_table = NetworkTableInstance.getDefault().getTable(name.title())
         self._nt_publishers = []
-        self._current_state_pub = self._network_table.getStringTopic("Current State").publish()
-        self._frozen_pub = self._network_table.getBooleanTopic("Frozen").publish()
+        
+        self._current_state_pub = self._network_table.getStringTopic("Current State").publish() # Publisher for current state
+        self._frozen_pub = self._network_table.getBooleanTopic("Frozen").publish() # Publisher for whether subsystem is frozen or not
 
-        self._sim_models: list[tuple[DCMotorSim, TalonFX]] = []
+        self._sim_models: list[tuple[DCMotorSim, TalonFX]] = [] # Simulation model
 
     def set_desired_state(self, desired_state: SubsystemState) -> None: # type: ignore
         """Override this method to handle desired state handling for
@@ -48,18 +49,24 @@ class StateSubsystem(Subsystem, ABC, metaclass=StateSubsystemMeta):
         self._subsystem_state = desired_state
 
     def periodic(self):
+
+        # Set publishers
         self._current_state_pub.set(self._subsystem_state.name.title().replace("_", " "))
         self._frozen_pub.set(self.is_frozen())
 
         # Update sim models
         if not utils.is_simulation():
             return
+        
         for model in self._sim_models:
-            sim = model[1].sim_state
+            sim = model[1].sim_state # Sim state of the motor this simulation model simulates
+
+            # Set supply voltage of the sim state, then set input voltage based on the sim state's motor voltage and update the model.
             sim.set_supply_voltage(RobotController.getBatteryVoltage())
             model[0].setInputVoltage(sim.motor_voltage)
             model[0].update(0.02)
 
+            # Set position, velocity, and acceleration based on the DCMotorSim's values
             sim.set_raw_rotor_position(units.radiansToRotations(model[0].getAngularPosition())
                                        * model[0].getGearing())
             sim.set_rotor_velocity(units.radiansToRotations(model[0].getAngularVelocity())
@@ -86,7 +93,8 @@ class StateSubsystem(Subsystem, ABC, metaclass=StateSubsystemMeta):
 
     def _add_talon_sim_model(self, talon: TalonFX, motor: DCMotor, gearing: float, 
                              moi: float=0.001) -> None:
-        """Creates a DCMotorSim that updates periodically during 
+        """
+        Creates a DCMotorSim that updates periodically during 
         simulation. This also logs the talon's status signals to Network
         Tables, regardless if simulated.
 
@@ -102,6 +110,8 @@ class StateSubsystem(Subsystem, ABC, metaclass=StateSubsystemMeta):
         defaults to 0.001
         :type moi: float, optional
         """
+
+        # Append the sim model of a DC motor to the list of sim models.
         self._sim_models.append(
             (DCMotorSim(
                 LinearSystemId.DCMotorSystem(
@@ -115,4 +125,7 @@ class StateSubsystem(Subsystem, ABC, metaclass=StateSubsystemMeta):
         )
     
     def set_desired_state_command(self, state: SubsystemState) -> Command:
+        """
+        Returns an instant command that sets the desired state.
+        """
         return InstantCommand(lambda: self.set_desired_state(state))

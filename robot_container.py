@@ -28,13 +28,20 @@ class RobotContainer:
             1
         )  # 3/4 of a rotation per second max angular velocity
 
+        # Define controllers, one for driving the swerve drive, and one for operating subsystems
         self._driver_controller = commands2.button.CommandXboxController(0)
         self._function_controller = commands2.button.CommandXboxController(1)
+
+        # Constraints for following paths created with PathPlanner
         self.path_constraints = PathConstraints(1, 1, 1, 1, unlimited=False)
+        
+        # This is the point at which we recognize that the trigger on the controller is being pressed
         self.trigger_margin = .75
 
+        # Our drivetrain created from the Swerve Project Generator by CTRE
         self.drivetrain = TunerConstants.create_drivetrain()
 
+        # All other subsystems. The drivetrain, pivot, and elevator are part of the superstructure. The climber and intake are standalone StateSubsystems.
         self.climber = ClimberSubsystem()
         self.pivot = PivotSubsystem()
         self.intake = IntakeSubsystem()
@@ -88,21 +95,23 @@ class RobotContainer:
             .with_deadband(self._max_speed * 0.01)
             .with_rotational_deadband(
                 self._max_angular_rate * 0.01
-            )  # Add a 10% deadband
+            )  # Add a 1% deadband
             .with_drive_request_type(
                 swerve.SwerveModule.DriveRequestType.OPEN_LOOP_VOLTAGE
             )  # Use open-loop control for drive motors
         )
+        
         self._robot_centric = (
             swerve.requests.RobotCentric()
             .with_deadband(self._max_speed * 0.01)
             .with_rotational_deadband(
                 self._max_angular_rate * 0.01
-            )  # Add a 10% deadband
+            )  # Add a 1% deadband
             .with_drive_request_type(
                 swerve.SwerveModule.DriveRequestType.OPEN_LOOP_VOLTAGE
             )  # Use open-loop control for drive motors
         )
+
         self._brake = swerve.requests.SwerveDriveBrake()
         self._point = swerve.requests.PointWheelsAt()
 
@@ -156,7 +165,9 @@ class RobotContainer:
             self.drivetrain.runOnce(lambda: self.drivetrain.seed_field_centric())
         )
 
-        #Left reef sides
+        # Y, X, A, B, Right Bumper, Left Bumper: Each side of the reef.
+
+        # Left Reef Sides triggered by left trigger
         (commands2.button.Trigger(lambda: self._driver_controller.getLeftTriggerAxis() >= self.trigger_margin) & self._driver_controller.y()).whileTrue(
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral A"], self.path_constraints)
                 )
@@ -176,7 +187,7 @@ class RobotContainer:
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral K"], self.path_constraints)
                 )  
 
-        #right reef sides
+        # Right Reef Sides triggered by right trigger
         (commands2.button.Trigger(lambda: self._driver_controller.getRightTriggerAxis() >= self.trigger_margin) & self._driver_controller.y()).whileTrue(
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral B"], self.path_constraints)
                 )
@@ -196,7 +207,7 @@ class RobotContainer:
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral L"], self.path_constraints)
                 )
         
-        #coral stations
+        # Both bumpers + Left/Right Bumper: Coral Station 1/2
         (commands2.button.Trigger(lambda: self._driver_controller.getRightTriggerAxis() >= self.trigger_margin) & commands2.button.Trigger(lambda: self._driver_controller.getLeftTriggerAxis() >= self.trigger_margin) & self._driver_controller.leftBumper()).whileTrue(
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral Station 1"], self.path_constraints)
                 )
@@ -204,7 +215,8 @@ class RobotContainer:
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral Station 2"], self.path_constraints)
                 )
 
-        (commands2.button.Trigger(lambda: self._driver_controller.getLeftTriggerAxis() < self.trigger_margin) & commands2.button.Trigger(lambda: self._driver_controller.getRightTriggerAxis() < self.trigger_margin) & self._driver_controller.rightBumper()).whileTrue( #Only does this function if the triggers aren't pressed
+        # Right bumper by itself applies robot centric drive
+        (commands2.button.Trigger(lambda: self._driver_controller.getLeftTriggerAxis() < self.trigger_margin) & commands2.button.Trigger(lambda: self._driver_controller.getRightTriggerAxis() < self.trigger_margin) & self._driver_controller.rightBumper()).whileTrue(
 
             self.drivetrain.apply_request(
                 lambda: (
