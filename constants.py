@@ -2,7 +2,7 @@ from phoenix6.configs.config_groups import Slot0Configs
 from phoenix6.signals import GravityTypeValue
 from robotpy_apriltag import AprilTagField, AprilTagFieldLayout
 
-apriltag_layout = AprilTagFieldLayout.loadField(AprilTagField.k2025Reefscape)
+apriltag_layout = AprilTagFieldLayout.loadField(AprilTagField.k2025ReefscapeWelded)
 
 class Constants:
 
