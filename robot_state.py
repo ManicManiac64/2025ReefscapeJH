@@ -45,10 +45,11 @@ class RobotState:
         self._swerve_data = self._table.getSubTable("Swerve Data")
         self._swerve_data.getEntry(".type").setString("SwerveDrive")  # Tells Elastic what widget this is
 
-        # Callbacks are functions passed into other functions. In these 2 cases, the function for setting a target pose and active path are passed 
+        # Callbacks are functions passed into other functions. These lambdas are the callbacks, and will be called whenever we log these values.
         PathPlannerLogging.setLogTargetPoseCallback(lambda pose: self._field.getObject("targetPose").setPose(pose))
         PathPlannerLogging.setLogActivePathCallback(lambda poses: self._field.getObject("activePath").setPoses(poses[::3]))
 
+        # If we are in simulation, implement mechanism2ds for display 
         if utils.is_simulation():
             self._superstructure_mechanism = Mechanism2d(0.5334, 2.286, Color8Bit("#000058"))
             self._root = self._superstructure_mechanism.getRoot("Root", 0.5334 / 2, 0.125)
@@ -65,9 +66,11 @@ class RobotState:
         updated.
         """
 
+        # Set our pose
         self._field.setRobotPose(state.pose)
         self._current_pose.set(state.pose)
 
+        # Frequency = 1/Period
         self._odom_freq.set(1.0 / state.odometry_period)
 
         self._module_states.set(state.module_states)
