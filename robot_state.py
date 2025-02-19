@@ -16,12 +16,16 @@ from subsystems.swerve import SwerveSubsystem
 class RobotState:
 
     def __init__(self, drivetrain: SwerveSubsystem, pivot: PivotSubsystem, elevator: ElevatorSubsystem):
+        
+        # Subsystems necessary for publishing robot state
         self._swerve = drivetrain
         self._pivot = pivot
         self._elevator = elevator
 
+        # This function starts a log for DriverStation data
         DriverStation.startDataLog(DataLogManager.getLog())
 
+        # Put field and robot pose on field on SmartDashboard. We can later use this in AdvantageScope for simulation or viewing logs.
         self._field = Field2d()
         SmartDashboard.putData("Field", self._field)
         self._field.setRobotPose(Pose2d())
@@ -41,6 +45,7 @@ class RobotState:
         self._swerve_data = self._table.getSubTable("Swerve Data")
         self._swerve_data.getEntry(".type").setString("SwerveDrive")  # Tells Elastic what widget this is
 
+        # Callbacks are functions passed into other functions. In these 2 cases, the function for setting a target pose and active path are passed 
         PathPlannerLogging.setLogTargetPoseCallback(lambda pose: self._field.getObject("targetPose").setPose(pose))
         PathPlannerLogging.setLogActivePathCallback(lambda poses: self._field.getObject("activePath").setPoses(poses[::3]))
 

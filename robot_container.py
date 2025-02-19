@@ -123,6 +123,9 @@ class RobotContainer:
         self.configure_button_bindings()
 
     def configure_button_bindings(self) -> None:
+
+        # See GitHub README for full overview of button bindings
+
         self.drivetrain.setDefaultCommand(
             self.drivetrain.apply_request(
                 lambda: (
@@ -165,9 +168,7 @@ class RobotContainer:
             self.drivetrain.runOnce(lambda: self.drivetrain.seed_field_centric())
         )
 
-        # Y, X, A, B, Right Bumper, Left Bumper: Each side of the reef.
-
-        # Left Reef Sides triggered by left trigger
+        # Left Reef Sides
         (commands2.button.Trigger(lambda: self._driver_controller.getLeftTriggerAxis() >= self.trigger_margin) & self._driver_controller.y()).whileTrue(
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral A"], self.path_constraints)
                 )
@@ -187,7 +188,7 @@ class RobotContainer:
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral K"], self.path_constraints)
                 )  
 
-        # Right Reef Sides triggered by right trigger
+        # Right Reef Sides
         (commands2.button.Trigger(lambda: self._driver_controller.getRightTriggerAxis() >= self.trigger_margin) & self._driver_controller.y()).whileTrue(
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral B"], self.path_constraints)
                 )
@@ -207,7 +208,7 @@ class RobotContainer:
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral L"], self.path_constraints)
                 )
         
-        # Both bumpers + Left/Right Bumper: Coral Station 1/2
+        # Coral Station 1/2
         (commands2.button.Trigger(lambda: self._driver_controller.getRightTriggerAxis() >= self.trigger_margin) & commands2.button.Trigger(lambda: self._driver_controller.getLeftTriggerAxis() >= self.trigger_margin) & self._driver_controller.leftBumper()).whileTrue(
                     AutoBuilder.pathfindThenFollowPath(self.preloaded_paths["Coral Station 1"], self.path_constraints)
                 )
@@ -325,6 +326,7 @@ class RobotContainer:
             self.pivot.sys_id_quasistatic(SysIdRoutine.Direction.kReverse).onlyIf(lambda: not DriverStation.isFMSAttached())
         )
 
+        # Register the lambda that logs swerve state for telemetry or logging
         self.drivetrain.register_telemetry(
             lambda state: self.robot_state.log_swerve_state(state)
         )
